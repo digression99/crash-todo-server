@@ -2,6 +2,7 @@ package com.devhouse.crashtodo.task;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,5 +36,11 @@ public class TaskService {
         prevTask.setTitle(updateTask.getTitle());
 
         return taskRepository.save(prevTask);
+    }
+
+    public Optional<Task> removeTask(int taskId) {
+        Optional<Task> deletedTask = taskRepository.findById(taskId);
+        taskRepository.deleteById(taskId);
+        return deletedTask;
     }
 }
