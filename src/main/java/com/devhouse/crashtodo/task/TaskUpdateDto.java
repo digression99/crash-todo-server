@@ -1,15 +1,18 @@
 package com.devhouse.crashtodo.task;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@Value
-public class TaskUpdateDto {
-    String title;
-
-    @JsonCreator
-    public TaskUpdateDto(@JsonProperty("title") String title) {
-        this.title = title;
-    }
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "name",
+        visible = true
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = TaskStatusToCreatedDto.class, name = "created"),
+        @JsonSubTypes.Type(value = TaskStatusToDeletedDto.class, name = "deleted"),
+        @JsonSubTypes.Type(value = TitleUpdateDto.class, name = "title") }
+)
+public interface TaskUpdateDto {
+    String getName();
 }

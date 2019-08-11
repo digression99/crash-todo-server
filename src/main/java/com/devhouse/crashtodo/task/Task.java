@@ -21,5 +21,7 @@ public class Task {
     Integer id;
 
     String title;
+
+    TaskStatus taskStatus;
 }
 

@@ -1,8 +1,8 @@
 package com.devhouse.crashtodo.task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,10 @@ public class TaskService {
 
     public Task createTask(TaskCreateDto requested) {
 
-        Task newTask = Task.builder().title(requested.getTitle()).build();
+        Task newTask = Task.builder()
+                .title(requested.getTitle())
+                .taskStatus(TaskStatus.CREATED)
+                .build();
 
         return taskRepository.save(newTask);
     }
@@ -24,7 +27,7 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-    public Task updateTask(int taskId, TaskUpdateDto updateTask) {
+    public Task updateTitle(int taskId, TitleUpdateDto titleUpdateDto) {
         Optional<Task> prevTaskOpt = taskRepository.findById(taskId);
 
         if (prevTaskOpt.isEmpty()) {
@@ -33,14 +36,43 @@ public class TaskService {
 
         Task prevTask = prevTaskOpt.get();
 
-        prevTask.setTitle(updateTask.getTitle());
+        prevTask.setTitle(titleUpdateDto.getTitle());
 
         return taskRepository.save(prevTask);
     }
 
-    public Optional<Task> removeTask(int taskId) {
-        Optional<Task> deletedTask = taskRepository.findById(taskId);
-        taskRepository.deleteById(taskId);
-        return deletedTask;
+    Task updateTaskStatusToDeleted(int taskId) {
+        return updateTaskStatus(taskId, TaskStatus.DELETED);
+    }
+
+    Task updateTaskStatusToCreated(int taskId) {
+        return updateTaskStatus(taskId, TaskStatus.CREATED);
+    }
+
+    Task updateTaskStatus(int taskId, TaskStatus taskStatus) {
+        Optional<Task> prevTaskOpt = taskRepository.findById(taskId);
+
+        if (prevTaskOpt.isEmpty()) {
+            return null;
+        }
+
+        Task prevTask = prevTaskOpt.get();
+
+        prevTask.setTaskStatus(taskStatus);
+
+        return taskRepository.save(prevTask);
+    }
+
+    public Task updateTask(int taskId, TaskUpdateDto taskUpdateDto) {
+        switch(taskUpdateDto.getName()) {
+            case "deleted":
+                return updateTaskStatusToDeleted(taskId);
+            case "created":
+                return updateTaskStatusToCreated(taskId);
+            case "title":
+                return updateTitle(taskId, (TitleUpdateDto) taskUpdateDto);
+            default:
+                return null;
+        }
     }
 }
