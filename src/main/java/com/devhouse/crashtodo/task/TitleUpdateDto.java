@@ -2,8 +2,11 @@ package com.devhouse.crashtodo.task;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
 import lombok.Value;
 
+@Builder
 @Value
 public class TitleUpdateDto implements TaskUpdateDto {
     String name;
